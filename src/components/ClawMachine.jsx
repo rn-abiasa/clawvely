@@ -102,7 +102,7 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
         <g filter="url(#sketch)" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round">
           <path className="cat-tail" d="M292 66q30-4 22-34" fill="none" stroke="#4A3B40" strokeWidth="9" />
           <ellipse cx="262" cy="58" rx="36" ry="20" fill="#4A3B40" />
-          <path d="M222 36l4-20 12 10zM250 28l10-18 6 18z" fill="#4A3B40" />
+          <path d="M221 37L224 17L235 28ZM237 28L248 17L251 37Z" fill="#4A3B40" />
           <circle cx="236" cy="44" r="18" fill="#4A3B40" />
           <path d="M226 52q10 10 20 0q-2 8-10 8t-10-8z" fill="#FFF8E6" strokeWidth="2" />
           <circle cx="230" cy="42" r="2.5" fill="#F7D774" stroke="none" />

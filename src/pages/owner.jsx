@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import PrizeCard from "../components/PrizeCard";
+import { cleanId } from "../lib/machine";
 import { rpc, supabase } from "../lib/supabase";
 
 export default function Owner() {
-  const { token } = useParams();
+  const token = cleanId(useParams().token);
   const [d, setD] = useState(null);
   const [failed, setFailed] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -62,7 +63,7 @@ export default function Owner() {
       {d.claims.map((c) => (
         <div key={c.id} className="space-y-3">
           <PrizeCard card={{ id: c.code, t: c.t, r: c.r, m: d.name, f: d.from, d: c.won_at }} redeemed={!!c.redeemed_at} />
-          {!c.redeemed_at && <button className="btn mx-auto flex" onClick={() => redeem(c.id)}>Tebus hadiah ini</button>}
+          {!c.redeemed_at && <button className="btn w-full" onClick={() => redeem(c.id)}>Tebus hadiah ini</button>}
         </div>
       ))}
     </main>

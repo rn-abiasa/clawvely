@@ -47,6 +47,13 @@ body::before {
   font: inherit;
   box-shadow: 3px 3px 0 var(--color-ink);
 }
+select.field {
+  appearance: none;
+  padding-right: 2.2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' fill='none' stroke='%233a2822' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 1.5l5.5 5.5 5.5-5.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+}
 .field:focus-visible,
 .btn:focus-visible,
 .dir:focus-visible {

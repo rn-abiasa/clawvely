@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ClawMachine from "../components/ClawMachine";
 import PrizeCard from "../components/PrizeCard";
-import { shareLink } from "../lib/machine";
+import { cleanId, shareLink } from "../lib/machine";
 import { rpc } from "../lib/supabase";
 
 const Notice = ({ text, children }) => (
@@ -15,7 +15,7 @@ const Notice = ({ text, children }) => (
 );
 
 export default function Play() {
-  const { id } = useParams();
+  const id = cleanId(useParams().id);
   const [m, setM] = useState(null);
   const [failed, setFailed] = useState(false);
   const [wins, setWins] = useState(0);

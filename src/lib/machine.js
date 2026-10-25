@@ -22,13 +22,15 @@ export const dec = (str = "") => {
   }
 };
 
+export const cleanId = (s = "") => s.trim().split(/\s+/)[0];
+
 export async function shareLink(url, text) {
   try {
     if (navigator.share) {
-      await navigator.share({ text, url });
+      await navigator.share({ text: `${text}\n${url}` });
       return "";
     }
-    await navigator.clipboard.writeText(`${text} ${url}`);
+    await navigator.clipboard.writeText(`${text}\n${url}`);
     return "Link disalin. Tempel ke chat dia.";
   } catch {
     return "";

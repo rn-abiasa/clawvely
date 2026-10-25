@@ -51,7 +51,7 @@ export default function Index() {
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-8 md:grid md:grid-cols-2 md:items-start md:gap-10">
-      <section>
+      <section className="md:sticky md:top-8">
         <h1 className="font-display text-5xl font-bold">Clawvely</h1>
         <p className="mb-4 text-lg">Isi mesinnya, kirim ke dia, biar dia yang menangkap hadiahnya.</p>
         <ClawMachine name={name} prizes={prizes} />
@@ -78,10 +78,10 @@ export default function Index() {
           <legend className="font-bold">Hadiah ({prizes.length}/6)</legend>
           {prizes.map((p, i) => (
             <div key={i} className="flex gap-2">
-              <input className="field" aria-label={`Hadiah ${i + 1}`} value={p.t} maxLength={60} onChange={(e) => edit(i, { t: e.target.value })} />
-              <button type="button" className="btn btn-alt !px-3 !text-base" title="Ganti kelangkaan" onClick={() => cycle(i)}>{RARITY[p.r].label}</button>
+              <input className="field min-w-0" aria-label={`Hadiah ${i + 1}`} value={p.t} maxLength={60} onChange={(e) => edit(i, { t: e.target.value })} />
+              <button type="button" className="btn btn-alt !w-[6.2rem] shrink-0 !px-2 !text-base" title="Ganti kelangkaan" onClick={() => cycle(i)}>{RARITY[p.r].label}</button>
               {prizes.length > 3 && (
-                <button type="button" className="btn btn-alt !px-3" aria-label={`Hapus hadiah ${i + 1}`} onClick={() => setPrizes(prizes.filter((_, j) => j !== i))}>×</button>
+                <button type="button" className="btn btn-alt shrink-0 !px-3" aria-label={`Hapus hadiah ${i + 1}`} onClick={() => setPrizes(prizes.filter((_, j) => j !== i))}>×</button>
               )}
             </div>
           ))}

@@ -5,12 +5,13 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./index.css";
 
 import Index from "./pages/index";
+import Play from "./pages/play";
+import CardPage from "./pages/card";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Index />,
-  },
+  { path: "/", element: <Index /> },
+  { path: "/m/:data", element: <Play /> },
+  { path: "/c/:data", element: <CardPage /> },
 ]);
 
 createRoot(document.getElementById("root")).render(

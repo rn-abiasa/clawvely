@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import PrizeCard from "../components/PrizeCard";
-import { cleanId } from "../lib/machine";
+import { GiftIcon } from "../components/Icons";
+import { KINDS, cleanId } from "../lib/machine";
 import { rpc, supabase } from "../lib/supabase";
 
 export default function Owner() {
@@ -29,12 +29,6 @@ export default function Owner() {
     };
   }, [load, token]);
 
-  const redeem = async (claimId) => {
-    await rpc("redeem_claim", { p_owner_token: token, p_claim_id: claimId });
-    load();
-  };
-  const playUrl = d && `${location.origin}/m/${d.play_id}`;
-
   if (failed) {
     return (
       <main className="grid min-h-dvh place-items-center p-6 text-center">
@@ -47,25 +41,34 @@ export default function Owner() {
   }
   if (!d) return <p className="p-10 text-center font-display text-2xl">Membuka dashboard...</p>;
 
+  const playUrl = `${location.origin}/m/${d.play_id}`;
+  const opened = d.prizes.filter((p) => p.opened_at).length;
+
   return (
     <main className="mx-auto max-w-md space-y-6 px-5 py-8">
       <header className="space-y-2">
         <h1 className="font-display text-4xl font-bold">{d.name}</h1>
-        <p>{d.claims.length} dari {d.max_wins} hadiah sudah dimenangkan.</p>
+        <p>{opened} dari {d.prizes.length} kejutan sudah dibuka.</p>
         <p className="rounded-lg bg-paper p-2 text-xs break-all">{playUrl}</p>
         <button className="btn !text-xl" onClick={async () => { await navigator.clipboard.writeText(playUrl); setCopied(true); }}>
           {copied ? "Tersalin" : "Salin link untuk dia"}
         </button>
       </header>
 
-      {d.claims.length === 0 && <p className="font-display text-2xl">Belum ada yang menang. Kirim link mesin ke dia dulu.</p>}
-
-      {d.claims.map((c) => (
-        <div key={c.id} className="space-y-3">
-          <PrizeCard card={{ id: c.code, t: c.t, r: c.r, m: d.name, f: d.from, d: c.won_at }} redeemed={!!c.redeemed_at} />
-          {!c.redeemed_at && <button className="btn w-full" onClick={() => redeem(c.id)}>Tebus hadiah ini</button>}
-        </div>
-      ))}
+      <ul className="space-y-3">
+        {d.prizes.map((p) => (
+          <li key={p.id} className="flex items-center gap-3 rounded-2xl border-[2.5px] border-ink bg-paper px-3 py-2 shadow-[3px_3px_0_var(--color-ink)]">
+            <GiftIcon kind={p.kind} size={36} />
+            <div className="min-w-0 flex-1">
+              <p className="font-bold">{KINDS[p.kind].label}</p>
+              <p className="text-sm">
+                {p.opened_at ? `Dibuka ${new Date(p.opened_at).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}` : "Belum dibuka"}
+              </p>
+            </div>
+            {p.claim_id && <Link className="text-sm font-bold underline" to={`/c/${p.claim_id}`}>Lihat</Link>}
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }

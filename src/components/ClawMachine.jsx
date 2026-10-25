@@ -1,26 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { CAPSULE_COLORS, RARITY } from "../lib/machine";
+import { CAPSULE_COLORS } from "../lib/machine";
+import { Capsule } from "./Icons";
 
 const INK = "#3A2822";
 const REST = 388, LEFT = 108, RIGHT = 298, CHUTE = 64, RAIL = 132, DROP = 206;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const tr = (t) => `transform ${t}ms ${t > 200 ? "ease-in-out" : "linear"}`;
 
-function Capsule({ color, rot }) {
-  return (
-    <g transform={`rotate(${rot})`}>
-      <circle r="20" fill={color} />
-      <path d="M-20 0A20 20 0 0 1 20 0Z" fill="#FFF8E6" />
-      <circle r="20" fill="none" stroke={INK} strokeWidth="3" />
-      <path d="M-20 0H20" stroke={INK} strokeWidth="2.5" />
-      <path d="M-11 -9q3-6 9-8" stroke="#fff" strokeWidth="3" strokeLinecap="round" fill="none" />
-    </g>
-  );
-}
-
-export default function ClawMachine({ name, prizes, play = false, onWin }) {
-  const n = prizes.length;
-  const home = prizes.map((_, i) => ({ x: n === 1 ? 203 : LEFT + (i * (RIGHT - LEFT)) / (n - 1), y: REST }));
+// prizes: [{ k: jenis, slot?: posisi asli }]; slots: jumlah posisi total (supaya bola lain tidak bergeser).
+export default function ClawMachine({ name, prizes, slots, play = false, fit = false, paused = false, onWin }) {
+  const total = Math.max(slots ?? prizes.length, 1);
+  const xAt = (s) => (total === 1 ? 203 : LEFT + (s * (RIGHT - LEFT)) / (total - 1));
+  const home = prizes.map((p, i) => ({ x: xAt(p.slot ?? i), y: REST }));
   const [claw, setClaw] = useState({ x: 203, d: 0, t: 0, open: true });
   const [held, setHeld] = useState(null);
   const [msg, setMsg] = useState("");
@@ -38,8 +29,34 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
   };
   useEffect(() => stop, []);
 
+  // Keyboard: panah kiri/kanan (atau A/D) tahan untuk geser; panah bawah, S, atau Spasi/Enter untuk capit.
+  // Tanpa daftar dependensi sengaja, supaya grab() selalu membaca posisi capit terbaru.
+  useEffect(() => {
+    if (!play || paused) return;
+    const typing = (t) => /^(INPUT|TEXTAREA|SELECT)$/.test(t?.tagName) || t?.isContentEditable;
+    const down = (e) => {
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || typing(e.target)) return;
+      const k = e.key.toLowerCase();
+      if (k === "arrowleft" || k === "a") { e.preventDefault(); start(-1); }
+      else if (k === "arrowright" || k === "d") { e.preventDefault(); start(1); }
+      else if (k === "arrowdown" || k === "s") { e.preventDefault(); grab(); }
+      else if ((k === " " || k === "enter") && !/^(BUTTON|A)$/.test(e.target.tagName)) { e.preventDefault(); grab(); }
+    };
+    const up = (e) => {
+      if (["arrowleft", "arrowright", "a", "d"].includes(e.key.toLowerCase())) stop();
+    };
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    window.addEventListener("blur", stop);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", stop);
+    };
+  });
+
   async function grab() {
-    if (!play || busy.current) return;
+    if (!play || paused || busy.current) return;
     busy.current = true;
     stop();
     setMsg("");
@@ -66,7 +83,7 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
       setClaw({ x, d, t, open: false });
       setHeld({ i, x, y: RAIL + d + 50, t });
     };
-    if (Math.random() > RARITY[prizes[i].r].grip) {
+    if (Math.random() < 0.2) {
       hold(cx, 90, 600);
       await sleep(650);
       setHeld(null);
@@ -80,7 +97,8 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
     setHeld({ i, x: CHUTE, y: 446, t: 500 });
     await sleep(700);
     busy.current = false;
-    onWin?.(prizes[i]);
+    await onWin?.(prizes[i]);
+    setHeld(null); // bola yang sudah diambil dihapus dari daftar oleh halaman induk
   }
 
   const arm = (side) => ({
@@ -91,8 +109,9 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
   const label = (name || "Mesin Hadiah").slice(0, 18);
 
   return (
-    <div>
-      <svg viewBox="0 0 360 500" className="mx-auto block w-full max-w-[380px]" role="img" aria-label={`Mesin capit ${label} berisi ${n} hadiah`}>
+    <div className={fit ? "flex h-full min-h-0 flex-col" : ""}>
+      <div className={fit ? "min-h-0 flex-1" : ""}>
+      <svg viewBox="0 0 360 500" className={fit ? "mx-auto block h-full w-full drop-shadow-[0_8px_0_rgba(58,40,34,.12)]" : "mx-auto block w-full max-w-[380px]"} role="img" aria-label={`Mesin capit ${label} berisi ${prizes.length} bola`}>
         <defs>
           <filter id="sketch" x="-5%" y="-5%" width="110%" height="110%">
             <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" />
@@ -121,8 +140,8 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
         {prizes.map((p, i) => {
           const h = held?.i === i ? held : { ...home[i], t: 400 };
           return (
-            <g key={i} style={{ transform: `translate(${h.x}px, ${h.y}px)`, transition: tr(h.t) }}>
-              <Capsule color={CAPSULE_COLORS[i % 6]} rot={((i * 37) % 24) - 12} />
+            <g key={p.id ?? i} style={{ transform: `translate(${h.x}px, ${h.y}px)`, transition: tr(h.t) }}>
+              <Capsule color={CAPSULE_COLORS[(p.slot ?? i) % 6]} rot={(((p.slot ?? i) * 37) % 24) - 12} kind={p.k} />
             </g>
           );
         })}
@@ -140,6 +159,7 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
 
         <path d="M50 134L118 134L62 300Z" fill="#fff" opacity=".28" />
       </svg>
+      </div>
 
       {play && (
         <>
@@ -161,6 +181,7 @@ export default function ClawMachine({ name, prizes, play = false, onWin }) {
             ))}
             <button className="btn" onClick={grab}>Capit!</button>
           </div>
+          <p className="mt-2 hidden text-center text-xs md:block">Keyboard: ← → untuk geser, Spasi atau ↓ untuk capit</p>
         </>
       )}
     </div>

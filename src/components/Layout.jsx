@@ -42,6 +42,13 @@ export default function Layout() {
     };
   }, [on]);
 
+  // Lagu YouTube mulai diputar: backsound berhenti (tidak disimpan sebagai pilihan).
+  useEffect(() => {
+    const duck = () => setOn(false);
+    window.addEventListener("clawvely:duck", duck);
+    return () => window.removeEventListener("clawvely:duck", duck);
+  }, []);
+
   const toggle = () => {
     const next = !on;
     setOn(next);

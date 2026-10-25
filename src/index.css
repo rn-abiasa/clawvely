@@ -13,6 +13,10 @@
   --font-body: "Nunito", system-ui, sans-serif;
   --animate-pop: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
   --animate-stamp: stamp 0.4s cubic-bezier(0.2, 1.8, 0.4, 1) both;
+  --animate-wiggle: wiggle 1.2s ease-in-out infinite;
+  --animate-burst: burst 0.45s ease-in both;
+  --animate-confetti: confetti 1.5s ease-out both;
+  --animate-float: float 3.5s ease-in-out infinite;
 }
 
 body {
@@ -132,15 +136,38 @@ select.field {
 @keyframes shine {
   to { background-position: -250% 0; }
 }
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg) scale(1.05); }
+}
+@keyframes burst {
+  to { transform: scale(1.6); opacity: 0; }
+}
+@keyframes confetti {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  60% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 1; }
+  100% { transform: translate(var(--dx), calc(var(--dy) + 110px)) rotate(var(--rot)); opacity: 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  50% { transform: translateY(-8px) rotate(0.6deg); }
+}
 @keyframes tail {
   0%, 100% { transform: rotate(0); }
   50% { transform: rotate(14deg); }
 }
 
+/* Hanya gerak dekoratif yang dikurangi. Gerak capit (transition) dan animasi masuk yang singkat
+   tetap jalan, karena itu bagian dari permainan. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  .animate-wiggle,
+  .animate-float,
+  .cat-tail,
+  .foil,
+  [class*="spin_50s"] {
+    animation: none !important;
+  }
+  .animate-confetti {
+    display: none;
   }
 }

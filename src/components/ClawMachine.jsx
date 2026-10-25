@@ -118,14 +118,16 @@ export default function ClawMachine({ name, prizes, slots, play = false, fit = f
             <feDisplacementMap in="SourceGraphic" scale="3.5" />
           </filter>
         </defs>
+        <path className="cat-tail" d="M292 66q30-4 22-34" fill="none" stroke="#4A3B40" strokeWidth="9" strokeLinecap="round" />
         <g filter="url(#sketch)" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round">
-          <path className="cat-tail" d="M292 66q30-4 22-34" fill="none" stroke="#4A3B40" strokeWidth="9" />
           <ellipse cx="262" cy="58" rx="36" ry="20" fill="#4A3B40" />
           <path d="M221 37L224 17L235 28ZM237 28L248 17L251 37Z" fill="#4A3B40" />
           <circle cx="236" cy="44" r="18" fill="#4A3B40" />
           <path d="M226 52q10 10 20 0q-2 8-10 8t-10-8z" fill="#FFF8E6" strokeWidth="2" />
-          <circle cx="230" cy="42" r="2.5" fill="#F7D774" stroke="none" />
-          <circle cx="243" cy="42" r="2.5" fill="#F7D774" stroke="none" />
+        </g>
+        <circle className="cat-eye" cx="230" cy="42" r="2.5" fill="#F7D774" />
+        <circle className="cat-eye" cx="243" cy="42" r="2.5" fill="#F7D774" />
+        <g filter="url(#sketch)" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round">
           <rect x="18" y="70" width="324" height="412" rx="28" fill="#EE6F5B" />
           <rect x="34" y="82" width="292" height="34" rx="14" fill="#FFF8E6" />
           <text x="180" y="107" textAnchor="middle" fontSize="26" fontWeight="700" fill={INK} stroke="none" style={{ fontFamily: "var(--font-display)" }}>{label}</text>

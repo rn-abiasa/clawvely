@@ -122,7 +122,12 @@ select.field {
 .cat-tail {
   transform-box: fill-box;
   transform-origin: 0% 100%;
-  animation: tail 3.2s ease-in-out infinite;
+  animation: tail 2.4s ease-in-out infinite;
+}
+.cat-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 4.5s ease-in-out infinite;
 }
 
 @keyframes pop {
@@ -153,17 +158,18 @@ select.field {
   50% { transform: translateY(-8px) rotate(0.6deg); }
 }
 @keyframes tail {
-  0%, 100% { transform: rotate(0); }
-  50% { transform: rotate(14deg); }
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(20deg); }
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
 }
 
-/* Hanya gerak dekoratif yang dikurangi. Gerak capit (transition) dan animasi masuk yang singkat
-   tetap jalan, karena itu bagian dari permainan. */
+/* Hanya gerak besar yang dikurangi (sinar berputar, hadiah melayang, confetti).
+   Gerak kecil (ekor dan mata kucing, bola bergoyang), gerak capit, dan animasi masuk tetap jalan. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-wiggle,
   .animate-float,
-  .cat-tail,
-  .foil,
   [class*="spin_50s"] {
     animation: none !important;
   }

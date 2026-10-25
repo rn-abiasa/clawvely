@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ClawMachine from "../components/ClawMachine";
-import { RARITY, RARITY_ORDER, enc } from "../lib/machine";
+import { RARITY, RARITY_ORDER } from "../lib/machine";
+import { rpc } from "../lib/supabase";
 
 const seed = [
   { t: "Nonton bareng, tiketnya aku yang beli", r: "biasa" },
@@ -13,21 +14,40 @@ export default function Index() {
   const [name, setName] = useState("Mesin Hadiah");
   const [from, setFrom] = useState("");
   const [prizes, setPrizes] = useState(seed);
-  const [data, setData] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [maxWins, setMaxWins] = useState(1);
+  const [made, setMade] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [copied, setCopied] = useState("");
+  const saved = (() => { try { return localStorage.getItem("clawvely:owner"); } catch { return null; } })();
 
   const ready = from.trim() && prizes.every((p) => p.t.trim());
   const edit = (i, patch) => setPrizes((ps) => ps.map((p, j) => (j === i ? { ...p, ...patch } : p)));
   const cycle = (i) => edit(i, { r: RARITY_ORDER[(RARITY_ORDER.indexOf(prizes[i].r) + 1) % 3] });
-  const make = () => {
-    setData(enc({ n: name.trim() || "Mesin Hadiah", f: from.trim(), p: prizes.map((p) => ({ t: p.t.trim(), r: p.r })) }));
-    setCopied(false);
+
+  const make = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      const r = await rpc("create_machine", {
+        p_name: name.trim() || "Mesin Hadiah",
+        p_from: from.trim(),
+        p_prizes: prizes.map((p) => ({ t: p.t.trim(), r: p.r })),
+        p_max_wins: maxWins,
+      });
+      try { localStorage.setItem("clawvely:owner", r.owner_token); } catch { /* abaikan */ }
+      setMade(r);
+    } catch (e) {
+      setErr(e.message);
+    }
+    setBusy(false);
   };
-  const link = `${location.origin}/m/${data}`;
-  const copy = async () => {
-    await navigator.clipboard.writeText(link);
-    setCopied(true);
+  const copy = async (key, url) => {
+    await navigator.clipboard.writeText(url);
+    setCopied(key);
   };
+  const playUrl = made && `${location.origin}/m/${made.play_id}`;
+  const ownerUrl = made && `${location.origin}/o/${made.owner_token}`;
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-8 md:grid md:grid-cols-2 md:items-start md:gap-10">
@@ -38,6 +58,7 @@ export default function Index() {
       </section>
 
       <section className="mt-8 space-y-5 md:mt-0">
+        {saved && <Link className="font-bold underline" to={`/o/${saved}`}>Buka dashboard mesin terakhirmu</Link>}
         <label className="block">
           <span className="font-bold">Nama mesin</span>
           <input className="field mt-1" value={name} maxLength={18} onChange={(e) => setName(e.target.value)} />
@@ -45,6 +66,12 @@ export default function Index() {
         <label className="block">
           <span className="font-bold">Namamu</span>
           <input className="field mt-1" value={from} maxLength={20} placeholder="Supaya dia tahu ini dari siapa" onChange={(e) => setFrom(e.target.value)} />
+        </label>
+        <label className="block">
+          <span className="font-bold">Dia boleh menang berapa hadiah?</span>
+          <select className="field mt-1" value={maxWins} onChange={(e) => setMaxWins(+e.target.value)}>
+            {[1, 2, 3].map((n) => <option key={n} value={n}>{n} hadiah</option>)}
+          </select>
         </label>
 
         <fieldset className="space-y-3">
@@ -63,16 +90,23 @@ export default function Index() {
           )}
         </fieldset>
 
-        <button className="btn" disabled={!ready} onClick={make}>Buat link mesin</button>
+        <button className="btn" disabled={!ready || busy} onClick={make}>{busy ? "Membuat mesin..." : "Buat mesin"}</button>
+        {err && <p role="alert" className="font-bold text-coral">{err}</p>}
 
-        {data && (
-          <div className="space-y-3 rounded-2xl border-[2.5px] border-ink bg-paper p-4">
-            <p className="font-bold">Mesinmu siap. Kirim link ini ke dia:</p>
-            <p className="rounded-lg bg-wall p-2 text-xs break-all">{link}</p>
-            <div className="flex flex-wrap gap-3">
-              <button className="btn !text-xl" onClick={copy}>{copied ? "Tersalin" : "Salin link"}</button>
-              <Link className="btn btn-alt !text-xl" to={`/m/${data}`}>Coba main dulu</Link>
-            </div>
+        {made && (
+          <div className="space-y-4 rounded-2xl border-[2.5px] border-ink bg-paper p-4">
+            <p className="font-bold">Mesinmu siap.</p>
+            {[
+              ["play", "Kirim link ini ke dia", playUrl],
+              ["owner", "Simpan link ini untuk dirimu sendiri (dashboard hadiah)", ownerUrl],
+            ].map(([key, label, url]) => (
+              <div key={key} className="space-y-2">
+                <p className="text-sm">{label}</p>
+                <p className="rounded-lg bg-wall p-2 text-xs break-all">{url}</p>
+                <button className="btn !text-xl" onClick={() => copy(key, url)}>{copied === key ? "Tersalin" : "Salin link"}</button>
+              </div>
+            ))}
+            <Link className="btn btn-alt !text-xl" to={`/o/${made.owner_token}`}>Buka dashboard</Link>
           </div>
         )}
       </section>

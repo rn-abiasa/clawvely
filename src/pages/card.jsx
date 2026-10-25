@@ -1,40 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import PrizeCard from "../components/PrizeCard";
-import { dec } from "../lib/machine";
+import { rpc } from "../lib/supabase";
 
 export default function CardPage() {
-  const card = dec(useParams().data);
-  const key = `clawvely:redeemed:${card?.id}`;
-  const [done, setDone] = useState(() => {
-    try { return localStorage.getItem(key) === "1"; } catch { return false; }
-  });
+  const { id } = useParams();
+  const [card, setCard] = useState(null);
+  const [failed, setFailed] = useState(false);
 
-  if (!card?.t) {
+  useEffect(() => {
+    rpc("get_claim", { p_claim_id: id })
+      .then((r) => (r ? setCard({ ...r, id: r.code }) : setFailed(true)))
+      .catch(() => setFailed(true));
+  }, [id]);
+
+  if (failed) {
     return (
       <main className="grid min-h-dvh place-items-center p-6 text-center">
-        <div>
+        <div className="space-y-4">
           <p className="font-display text-3xl font-bold">Kartu ini tidak bisa dibuka</p>
-          <Link className="btn mt-4" to="/">Ke beranda</Link>
+          <Link className="btn" to="/">Ke beranda</Link>
         </div>
       </main>
     );
   }
-
-  const redeem = () => {
-    try { localStorage.setItem(key, "1"); } catch { /* penyimpanan tidak tersedia */ }
-    setDone(true);
-  };
+  if (!card) return <p className="p-10 text-center font-display text-2xl">Membuka kartu...</p>;
 
   return (
     <main className="mx-auto max-w-sm space-y-6 px-5 py-10 text-center">
-      <h1 className="font-display text-4xl font-bold">Bukti hadiah dari dia</h1>
-      <PrizeCard card={card} redeemed={done} />
-      {done ? (
-        <p className="font-display text-2xl font-bold">Hadiah sudah ditebus.</p>
-      ) : (
-        <button className="btn" onClick={redeem}>Tebus hadiah ini</button>
-      )}
+      <h1 className="font-display text-4xl font-bold">Bukti hadiah</h1>
+      <PrizeCard card={card} redeemed={!!card.redeemed_at} />
+      <p className="font-display text-2xl font-bold">
+        {card.redeemed_at ? "Hadiah sudah ditebus." : `Menunggu ${card.f} menebus hadiah ini.`}
+      </p>
     </main>
   );
 }

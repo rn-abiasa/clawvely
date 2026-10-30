@@ -7,9 +7,6 @@ import "./index.css";
 import Layout from "./components/Layout";
 import Index from "./pages/index";
 import Play from "./pages/play";
-import CardPage from "./pages/card";
-import Owner from "./pages/owner";
-import Collection from "./pages/collection";
 
 const router = createBrowserRouter([
   {
@@ -17,9 +14,6 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Index /> },
       { path: "/m/:id", element: <Play /> },
-      { path: "/c/:id", element: <CardPage /> },
-      { path: "/k/:id", element: <Collection /> },
-      { path: "/o/:token", element: <Owner /> },
     ],
   },
 ]);

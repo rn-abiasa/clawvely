@@ -52,7 +52,7 @@ export default function Reveal({ kind, data, from, children }) {
         {phase >= 2 && (
           <>
             <p className="-rotate-2 animate-pop rounded-lg border-[3px] border-ink bg-butter px-4 py-1 font-display text-2xl font-bold shadow-[3px_3px_0_var(--color-ink)]">
-              Kejutan dari {from}
+              A surprise from {from}
             </p>
             <div className={`w-full ${kind === "song" ? "" : "animate-float"}`}>
               <GiftItem kind={kind} data={data} from={from} />

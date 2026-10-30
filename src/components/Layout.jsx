@@ -63,7 +63,7 @@ export default function Layout() {
     <>
       <button
         className="dir fixed bottom-3 right-3 z-20 !h-11 !w-11"
-        aria-label={on ? "Matikan musik" : "Nyalakan musik"}
+        aria-label={on ? "Turn music off" : "Turn music on"}
         aria-pressed={on}
         onClick={toggle}
       >

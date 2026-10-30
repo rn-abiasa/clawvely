@@ -71,7 +71,7 @@ export default function StampArt({ id, className = "" }) {
   const size = s.title.length > 12 ? 17 : 21;
 
   return (
-    <svg viewBox="0 0 200 250" className={className} style={{ filter: "drop-shadow(3px 4px 0 rgba(58,40,34,.3))" }} role="img" aria-label={`Prangko ${s.title}`}>
+    <svg viewBox="0 0 200 250" className={className} style={{ filter: "drop-shadow(3px 4px 0 rgba(58,40,34,.3))" }} role="img" aria-label={`Stamp ${s.title}`}>
       <defs>
         <mask id={uid}>
           <rect width="200" height="250" fill="#fff" />

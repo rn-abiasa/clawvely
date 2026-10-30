@@ -17,6 +17,7 @@
   --animate-burst: burst 0.45s ease-in both;
   --animate-confetti: confetti 1.5s ease-out both;
   --animate-float: float 3.5s ease-in-out infinite;
+  --animate-fall: fall 4s linear infinite;
 }
 
 body {
@@ -157,6 +158,14 @@ select.field {
   0%, 100% { transform: translateY(0) rotate(-0.6deg); }
   50% { transform: translateY(-8px) rotate(0.6deg); }
 }
+@keyframes fall {
+  from { transform: translateY(-8vh) rotate(0); }
+  to { transform: translateY(110vh) rotate(var(--rot)); }
+}
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px) rotate(-3deg); }
+}
 @keyframes tail {
   0%, 100% { transform: rotate(-4deg); }
   50% { transform: rotate(20deg); }
@@ -164,16 +173,4 @@ select.field {
 @keyframes blink {
   0%, 92%, 100% { transform: scaleY(1); }
   96% { transform: scaleY(0.1); }
-}
-
-/* Hanya gerak besar yang dikurangi (sinar berputar, hadiah melayang, confetti).
-   Gerak kecil (ekor dan mata kucing, bola bergoyang), gerak capit, dan animasi masuk tetap jalan. */
-@media (prefers-reduced-motion: reduce) {
-  .animate-float,
-  [class*="spin_50s"] {
-    animation: none !important;
-  }
-  .animate-confetti {
-    display: none;
-  }
 }

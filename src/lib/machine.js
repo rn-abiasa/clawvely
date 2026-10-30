@@ -1,5 +1,5 @@
 export const CAPSULE_COLORS = ["#F29B93", "#9FC9E8", "#F5D27A", "#A9D9BC", "#C4A8E6", "#F4A874"];
-// Prangko siap pakai (tulisan, warna, dan gambar sudah ditentukan).
+// Ready-made stamps (text, colors, and artwork are fixed).
 export const STAMPS = [
   { id: "best-friend", title: "Best Friend", icon: "paw", denom: "10", sky: "#F7C65B", main: "#E8553F" },
   { id: "favorite-person", title: "Favorite Person", icon: "heart", denom: "01", sky: "#F6A9A0", main: "#C93C58" },
@@ -8,15 +8,15 @@ export const STAMPS = [
   { id: "my-sunshine", title: "My Sunshine", icon: "sun", denom: "08", sky: "#F9D56E", main: "#D9572B" },
   { id: "forever-yours", title: "Forever Yours", icon: "flower", denom: "99", sky: "#C9B3EA", main: "#6B49A8" },
   { id: "cutie-pie", title: "Cutie Pie", icon: "star", denom: "15", sky: "#F4B183", main: "#B8452B" },
-  { id: "dekat-di-hati", title: "Dekat di Hati", icon: "plane", denom: "25", sky: "#A8D5EC", main: "#2C6E8F" },
+  { id: "dekat-di-hati", title: "Close at Heart", icon: "plane", denom: "25", sky: "#A8D5EC", main: "#2C6E8F" },
 ];
 
 export const KINDS = {
-  message: { label: "Pesan", hint: "Surat dalam amplop" },
-  song: { label: "Lagu", hint: "Piringan vinyl dari YouTube" },
-  photo: { label: "Foto", hint: "Polaroid kenangan" },
-  voucher: { label: "Voucher", hint: "Tiket hadiah, misalnya pulsa atau kuota" },
-  stamp: { label: "Prangko", hint: "Prangko manis untuk dia" },
+  message: { label: "Message", hint: "A letter in an envelope" },
+  song: { label: "Song", hint: "A vinyl record from YouTube" },
+  photo: { label: "Photo", hint: "A polaroid memory" },
+  voucher: { label: "Voucher", hint: "A gift ticket, like phone credit or a treat" },
+  stamp: { label: "Stamp", hint: "A sweet postage stamp just for them" },
 };
 
 export const cleanId = (s = "") => s.trim().split(/\s+/)[0];
@@ -28,9 +28,9 @@ export const parseYouTube = (s = "") => {
 };
 
 export const giftLabel = (kind, d = {}) =>
-  ({ message: d.text, song: d.title || "Lagu", photo: d.caption || "Foto", voucher: d.title, stamp: STAMPS.find((s) => s.id === d.s)?.title })[kind] || "";
+  ({ message: d.text, song: d.title || "Song", photo: d.caption || "Photo", voucher: d.title, stamp: STAMPS.find((s) => s.id === d.s)?.title })[kind] || "";
 
-// Kecilkan foto di browser supaya ringan disimpan (sekitar 50-100 KB).
+// Shrink the photo in the browser so it stays light to store (about 50-100 KB).
 export function compressImage(file, max = 720, quality = 0.72) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -44,7 +44,7 @@ export function compressImage(file, max = 720, quality = 0.72) {
       URL.revokeObjectURL(url);
       resolve(c.toDataURL("image/jpeg", quality));
     };
-    img.onerror = () => reject(new Error("Foto tidak bisa dibaca"));
+    img.onerror = () => reject(new Error("Couldn't read that photo"));
     img.src = url;
   });
 }
@@ -56,7 +56,7 @@ export async function shareLink(url, text) {
       return "";
     }
     await navigator.clipboard.writeText(`${text}\n${url}`);
-    return "Link disalin. Tempel ke chat dia.";
+    return "Link copied. Paste it into your chat.";
   } catch {
     return "";
   }
